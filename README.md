@@ -1,48 +1,47 @@
+# Bootcamp Repository
 
-# Project Title
-**Stage:** Problem Framing & Scoping (Stage 01)
+This repository separates instructor-provided materials, submitted homework, and the ongoing financial engineering project.
 
-## Problem Statement
-<1–2 paragraphs: what problem & why it matters>
+## Folder Structure
 
-## Stakeholder & User
-<Who decides? Who uses the output? Timing & workflow context>
+- `class_materials/` - original course files grouped by stage. Keep these files unchanged and local only.
+- `homework/` - submitted work, with one folder per assignment (`homework0`, `homework1`, and so on).
+- `project/` - the persistent project that grows across lifecycle stages.
 
-## Useful Answer & Decision
-<Descriptive / Predictive / Causal; metric; artifact to deliver>
+## Homework Folder Rules
 
-## Assumptions & Constraints
-<Bullets: data availability, capacity, latency, compliance, etc.>
+1. Copy any starter file from `class_materials/` into the matching `homework/homeworkN/` folder.
+2. Edit only the homework copy.
+3. Include every file required for grading and commit the completed folder.
 
-## Known Unknowns / Risks
-<Bullets: what’s uncertain; how you’ll test or monitor>
+## Class Materials Rules
 
-## Lifecycle Mapping
-Goal → Stage → Deliverable
-- <Goal A> → Problem Framing & Scoping (Stage 01) → <Deliverable X>
+1. Store each stage in its own folder, such as `class_materials/stage03_python-fundamentals/`.
+2. Keep the reading, lecture notebook, homework sheet, project instructions, and supporting data together.
+3. Run lecture notebooks from their stage folder so relative data paths resolve correctly.
+4. Never commit `class_materials/`; the root `.gitignore` excludes it.
 
-## Repo Plan
-data/, src/, notebooks/, docs/ ; cadence for updates
+## Project Folder Rules
 
-## Local Configuration
+- `project/data/raw/` stores immutable source data.
+- `project/data/processed/` stores reproducible derived data.
+- `project/notebooks/` contains project analysis and experiments.
+- `project/src/` contains reusable Python code.
+- `project/docs/` contains framing, assumptions, risks, and design notes.
+- `project/reports/` contains stakeholder-facing outputs.
+- `project/model/` contains model artifacts created in later stages.
 
-The lecture notebooks use `python-dotenv` to read project-specific settings from
-the root-level `.env` file. A safe template is provided in `.env.example`.
+## Environment
 
-For a new local checkout, create the working configuration in PowerShell:
+Create or update the course environment from the repository root:
 
 ```powershell
-Copy-Item .env.example .env
+conda env create -f environment.yml
+conda activate bootcamp_env
 ```
 
-Then edit `.env` if needed:
+Local configuration belongs in `.env`; the safe template is `.env.example`. Never commit the real `.env` file.
 
-- `ALPHAVANTAGE_API_KEY` may contain a personal Alpha Vantage API key. Leaving
-  it empty makes the Stage 04 notebook use its `yfinance` fallback.
-- `DATA_DIR_RAW` and `DATA_DIR_PROCESSED` control the Stage 05 data folders.
-- `DATA_DIR` is the path value used by the Stage 02 configuration
-  demonstration.
+## GitHub
 
-Never commit `.env`: it is intentionally ignored by Git. Commit
-`.env.example` whenever the project needs a new configuration variable, but
-keep all example values free of real credentials.
+Course repository: <https://github.com/SunChuyun/bootcamp_project>

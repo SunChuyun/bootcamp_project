@@ -3,16 +3,23 @@
 .env.*
 !.env.example
 
+# Instructor-provided local course materials
+class_materials/
+
 # Python and Jupyter generated files
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 
-# Generated data files
-data/raw/*
-data/processed/*
+# Generated project data files
+project/data/raw/*
+project/data/processed/*
 
-# Keep the data folders and the small Stage 03 input in Git
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-!data/raw/starter_data.csv
+# Keep the project data directories in Git
+!project/data/raw/.gitkeep
+!project/data/processed/.gitkeep
+
+# Local temporary and operating-system files
+tmp/
+.DS_Store
+Thumbs.db
