@@ -23,3 +23,26 @@ Goal → Stage → Deliverable
 
 ## Repo Plan
 data/, src/, notebooks/, docs/ ; cadence for updates
+
+## Local Configuration
+
+The lecture notebooks use `python-dotenv` to read project-specific settings from
+the root-level `.env` file. A safe template is provided in `.env.example`.
+
+For a new local checkout, create the working configuration in PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Then edit `.env` if needed:
+
+- `ALPHAVANTAGE_API_KEY` may contain a personal Alpha Vantage API key. Leaving
+  it empty makes the Stage 04 notebook use its `yfinance` fallback.
+- `DATA_DIR_RAW` and `DATA_DIR_PROCESSED` control the Stage 05 data folders.
+- `DATA_DIR` is the path value used by the Stage 02 configuration
+  demonstration.
+
+Never commit `.env`: it is intentionally ignored by Git. Commit
+`.env.example` whenever the project needs a new configuration variable, but
+keep all example values free of real credentials.

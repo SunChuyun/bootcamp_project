@@ -1,0 +1,18 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python and Jupyter generated files
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Generated data files
+data/raw/*
+data/processed/*
+
+# Keep the data folders and the small Stage 03 input in Git
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/raw/starter_data.csv
