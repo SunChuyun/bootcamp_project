@@ -5,6 +5,7 @@
 
 # Instructor-provided local course materials
 class_materials/
+homework_materials/
 
 # Python and Jupyter generated files
 __pycache__/
