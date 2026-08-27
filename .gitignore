@@ -12,13 +12,10 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 
-# Generated project data files
+# Reproducible project data and fitted models
 project/data/raw/*
 project/data/processed/*
-
-# Keep the project data directories in Git
-!project/data/raw/.gitkeep
-!project/data/processed/.gitkeep
+project/model/*
 
 # Local temporary and operating-system files
 tmp/
