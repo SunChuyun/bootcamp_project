@@ -1,12 +1,14 @@
 # Bootcamp Repository
 
 ## Folder Structure
-- **homework/** → All homework contributions will be submitted here.
-- **project/** → All project contributions will be submitted here.
-- **class_materials/** → Local storage for class materials. Never pushed to GitHub.
+
+- **homework/** → Completed, self-contained homework submissions.
+- **project/** → One cumulative ETF momentum project covering the full lifecycle.
+- **class_materials/** → Instructor lectures and readings; kept local and never pushed.
+- **homework_materials/** → Instructor homework sheets, starters, and project instructions; kept local and never pushed.
 
 ## Homework Folder Rules
-- Each homework will be in its own subfolder (`homework0`, `homework1`, etc.)
+- Each homework is in its own subfolder (`homework0` through `homework13`).
 - Include all required files for grading.
 
 ## Class Materials Rules
@@ -15,5 +17,6 @@
 - Copy a homework starter into `homework/homeworkN/` before working on it.
 
 ## Project Folder Rules
-- Keep project files organized and clearly named.
-- The project folder structure is set up in Stage 02.
+- Keep one cumulative project rather than one project folder per stage.
+- Run `project/notebooks/project_pipeline.ipynb` from top to bottom after each project contribution.
+- See `project/README.md` for setup, lifecycle mapping, API use, and the command-line reporting step.

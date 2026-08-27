@@ -28,6 +28,8 @@ This is an educational backtest. The main result is gross of costs, with a 10 bp
 - `reports/images/`: charts created by the pipeline.
 - `reports/`: metrics, sensitivity tables, and the executive summary.
 - `model/`: the saved linear-regression baseline.
+- `app.py`: Flask prediction API that loads the saved model once.
+- `requirements.txt`: minimal direct dependencies for this project.
 
 ## Data Storage
 
@@ -56,6 +58,72 @@ Using data through August 26, 2026, the momentum strategy produced a 9.24% gross
 
 The regression baseline has limited predictive value: test $R^2$ is 0.003 and sign accuracy is 52.6%. Excluding training observations flagged by training-only IQR thresholds raises sign accuracy to 53.9% but does not materially improve $R^2$. The latest completed-month signal selects DBC and VNQ.
 
-## Run
+## Install and Run
 
-Activate the repository's `bootcamp_env`, install the root `requirements.txt`, and run `notebooks/project_pipeline.ipynb` from top to bottom. No API key is required.
+From a fresh clone:
+
+```powershell
+conda create -n bootcamp_env python=3.11 -y
+conda activate bootcamp_env
+pip install -r project/requirements.txt
+copy project/.env.example project/.env
+jupyter lab
+```
+
+Open `project/notebooks/project_pipeline.ipynb` and run it from top to bottom. It refreshes the committed small data files, saved model, and reports. No API key is required.
+
+## Prediction API
+
+Run the pipeline first so `model/return_model.pkl` exists. From `project/`, start the service:
+
+```powershell
+python app.py
+```
+
+Check it with `requests`:
+
+```python
+import joblib
+import requests
+
+bundle = joblib.load("model/return_model.pkl")
+payload = {"features": {name: 0.0 for name in bundle["features"]}}
+print(requests.get("http://127.0.0.1:5001/health").json())
+print(requests.post("http://127.0.0.1:5001/predict", json=payload).json())
+```
+
+Missing, extra, nonnumeric, or nonfinite feature values return a JSON error with HTTP 400.
+
+## Command-Line Reporting Step
+
+Run the pipeline first so `data/processed/monthly_backtest.csv` exists. From `project/`:
+
+```powershell
+python -m src.run_step
+```
+
+The command rebuilds `reports/orchestration_metrics.csv` and writes `reports/pipeline.log`. It accepts optional `--input`, `--output`, and `--log` paths. The step is idempotent: the same validated input overwrites the same output.
+
+## Lifecycle Map
+
+| Stage | Main location |
+|---|---|
+| 01 Problem framing | `docs/stakeholder_memo.md` |
+| 02 Tooling | `.env.example`, `requirements.txt`, `src/config.py` |
+| 03 Python fundamentals | `notebooks/python_fundamentals_summary.ipynb`, `src/utils.py` |
+| 04 Acquisition | `src/data.py`, `data/raw/` |
+| 05 Storage | `src/storage.py`, `data/processed/` |
+| 06 Preprocessing | `src/cleaning.py` |
+| 07 Outliers | `src/outliers.py`, `docs/assumptions.md` |
+| 08 EDA | `src/eda.py`, `reports/images/` |
+| 09 Features | `src/features.py` |
+| 10a Regression | `src/modeling.py`, cumulative notebook |
+| 10b Time series | `src/strategy.py`, cumulative notebook |
+| 11 Evaluation | `src/evaluation.py`, `reports/risk_summary.csv` |
+| 12 Reporting | `reports/executive_summary.md`, `reports/images/` |
+| 13 Productization | `app.py`, `docs/stakeholder_handoff.md` |
+| 14 Monitoring | `docs/monitoring_plan.md`, `docs/handoff_plan.md` |
+| 15 Orchestration | `docs/orchestration_plan.md`, `src/run_step.py` |
+| 16 Lifecycle review | `docs/lifecycle_framework_guide.md`, `docs/project_summary.md` |
+
+The detailed lifecycle decisions are in `docs/lifecycle_framework_guide.md`.

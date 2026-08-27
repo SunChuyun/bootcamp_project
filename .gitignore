@@ -12,10 +12,8 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 
-# Reproducible project data and fitted models
-project/data/raw/*
-project/data/processed/*
-project/model/*
+# Generated runtime logs
+*.log
 
 # Local temporary and operating-system files
 tmp/
