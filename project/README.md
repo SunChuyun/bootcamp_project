@@ -1,62 +1,26 @@
 # Cross-Asset ETF Momentum Rotation
 
-## Project Summary
+## Overview
 
-This project tests a monthly ETF momentum rotation strategy. It ranks a diversified ETF universe by six-month price momentum and holds the two strongest ETFs at equal weights for the following month.
+This project tests a monthly ETF rotation strategy. It ranks eight ETFs by six-month momentum and holds the top two at equal weights in the following month. SPY is the benchmark.
 
-The intended stakeholder is an investment analyst evaluating whether a simple, transparent allocation rule is useful as a research baseline. The main concerns are return, volatility, drawdown, stability across assumptions, and implementation risk.
+The data comes from Yahoo Finance through `yfinance` and covers January 2016 through August 2026. The analysis uses lagged signals to avoid look-ahead bias. Results are educational and exclude taxes, market impact, and changing bid-ask spreads.
 
-## Strategy Scope
+## Main Results
 
-- Universe: SPY, EFA, EEM, TLT, IEF, GLD, VNQ, and DBC.
-- Data: adjusted daily prices and volume from Yahoo Finance through `yfinance`.
-- Sample: January 2016 through August 2026.
-- Rebalancing: monthly.
-- Signal: six-month total return.
-- Portfolio: equal-weight the top two ETFs, with a one-month lag between signal and realized return.
-- Benchmark: SPY.
+Through August 26, 2026, the strategy produced a 9.24% gross annualized return, 12.73% annualized volatility, a 0.76 Sharpe ratio, and a -19.58% maximum drawdown. At a constant 10 bps per traded dollar, annualized return falls to 8.45% and Sharpe falls to 0.70.
 
-This is an educational backtest. The main result is gross of costs, with a 10 bps-per-traded-dollar sensitivity. Taxes, bid-ask variation, market impact, and live trading constraints remain excluded.
+Over the aligned sample, SPY returned 14.98% annually with a 0.99 Sharpe ratio and a -23.93% maximum drawdown. The strategy reduced drawdown but underperformed SPY on return and risk-adjusted return. The regression baseline also has limited predictive value, with test $R^2$ of 0.003 and 52.6% sign accuracy.
 
 ## Project Structure
 
-- `data/raw/`: unedited Yahoo Finance observations.
-- `data/processed/`: cleaned prices, engineered features, and backtest tables.
-- `notebooks/`: the cumulative project pipeline and the Stage 03 Python summary.
-- `src/`: reusable acquisition, cleaning, analysis, feature, strategy, and evaluation functions.
-- `docs/`: stakeholder context and modeling assumptions.
-- `reports/images/`: charts created by the pipeline.
-- `reports/`: metrics, sensitivity tables, and the executive summary.
-- `model/`: the saved linear-regression baseline.
-- `app.py`: Flask prediction API that loads the saved model once.
-- `requirements.txt`: minimal direct dependencies for this project.
-
-## Data Storage
-
-Relative paths are defined in `.env`. Raw observations are stored as CSV for portability. Cleaned and feature tables are stored as Parquet to preserve dates and numeric types. The pipeline reloads each saved table and validates its structure.
-
-## Cleaning and Outlier Policy
-
-Duplicate ticker-date rows are removed, dates and numeric columns are parsed, nonpositive prices are rejected, and missing volume is set to zero. Daily-return outliers are flagged within each ETF using the 1.5-IQR rule. Raw observations are retained; outliers are not automatically deleted because they may represent genuine market shocks.
-
-## Feature Definitions
-
-- `return_1d`: one-day ETF return.
-- `momentum_21d`, `momentum_63d`, `momentum_126d`: trailing price returns.
-- `volatility_21d`: annualized rolling standard deviation of daily returns.
-- `drawdown_63d`: price relative to its rolling 63-day high.
-- ticker indicators: one-hot encoding for the pooled regression baseline.
-- `next_day_return`: next trading day's return, used only as the model target.
-
-## Modeling and Evaluation
-
-The strategy is rule-based. A separate linear-regression baseline uses a time-aware train/test split to test whether the engineered features contain short-horizon predictive information. Outlier thresholds for its sensitivity check are estimated from training rows only. Results include MAE, RMSE, $R^2$, sign accuracy, annualized return, annualized volatility, zero-risk-free-rate Sharpe ratio, maximum drawdown, turnover, a 10 bps cost sensitivity, and a bootstrap interval.
-
-## Current Results
-
-Using data through August 26, 2026, the momentum strategy produced a 9.24% gross annualized return, 12.73% annualized volatility, a 0.76 gross Sharpe ratio, and a -19.58% maximum drawdown. With the 10 bps cost sensitivity, annualized return falls to 8.45% and Sharpe falls to 0.70. SPY produced a 14.98% annualized return, a 0.99 Sharpe ratio, and a -23.93% maximum drawdown over the aligned monthly sample. The strategy therefore reduced drawdown but underperformed SPY on return and risk-adjusted return.
-
-The regression baseline has limited predictive value: test $R^2$ is 0.003 and sign accuracy is 52.6%. Excluding training observations flagged by training-only IQR thresholds raises sign accuracy to 53.9% but does not materially improve $R^2$. The latest completed-month signal selects DBC and VNQ.
+- `data/`: raw and processed data.
+- `notebooks/`: the complete project pipeline.
+- `src/`: reusable data, modeling, strategy, and evaluation functions.
+- `model/`: saved regression model.
+- `reports/`: tables, charts, and the executive summary.
+- `docs/`: assumptions, monitoring, handoff, and lifecycle documents.
+- `app.py`: Flask prediction API.
 
 ## Install and Run
 
@@ -70,60 +34,56 @@ copy project/.env.example project/.env
 jupyter lab
 ```
 
-Open `project/notebooks/project_pipeline.ipynb` and run it from top to bottom. It refreshes the committed small data files, saved model, and reports. No API key is required.
+Open `project/notebooks/project_pipeline.ipynb` and run all cells from top to bottom. The pipeline downloads data, rebuilds the analysis, saves the model, and updates the reports. No API key is required.
 
 ## Prediction API
 
-Run the pipeline first so `model/return_model.pkl` exists. From `project/`, start the service:
+After running the pipeline, start the API from `project/`:
 
 ```powershell
 python app.py
 ```
 
-Check it with `requests`:
+Example requests:
 
 ```python
 import joblib
 import requests
 
 bundle = joblib.load("model/return_model.pkl")
-payload = {"features": {name: 0.0 for name in bundle["features"]}}
+features = {name: 0.0 for name in bundle["features"]}
+
 print(requests.get("http://127.0.0.1:5001/health").json())
-print(requests.post("http://127.0.0.1:5001/predict", json=payload).json())
+print(requests.post(
+    "http://127.0.0.1:5001/predict",
+    json={"features": features},
+).json())
 ```
 
-Missing, extra, nonnumeric, or nonfinite feature values return a JSON error with HTTP 400.
+Invalid, missing, or extra feature values return HTTP 400 with a JSON error.
 
-## Command-Line Reporting Step
+## Command-Line Step
 
-Run the pipeline first so `data/processed/monthly_backtest.csv` exists. From `project/`:
+After running the pipeline, rebuild the orchestration report from `project/`:
 
 ```powershell
 python -m src.run_step
 ```
 
-The command rebuilds `reports/orchestration_metrics.csv` and writes `reports/pipeline.log`. It accepts optional `--input`, `--output`, and `--log` paths. The step is idempotent: the same validated input overwrites the same output.
+This command reads the saved monthly backtest, writes `reports/orchestration_metrics.csv`, and records the run in `reports/pipeline.log`.
 
 ## Lifecycle Map
 
-| Stage | Main location |
+| Stage | Main artifact |
 |---|---|
-| 01 Problem framing | `docs/stakeholder_memo.md` |
-| 02 Tooling | `.env.example`, `requirements.txt`, `src/config.py` |
-| 03 Python fundamentals | `notebooks/python_fundamentals_summary.ipynb`, `src/utils.py` |
-| 04 Acquisition | `src/data.py`, `data/raw/` |
-| 05 Storage | `src/storage.py`, `data/processed/` |
-| 06 Preprocessing | `src/cleaning.py` |
-| 07 Outliers | `src/outliers.py`, `docs/assumptions.md` |
-| 08 EDA | `src/eda.py`, `reports/images/` |
-| 09 Features | `src/features.py` |
-| 10a Regression | `src/modeling.py`, cumulative notebook |
-| 10b Time series | `src/strategy.py`, cumulative notebook |
-| 11 Evaluation | `src/evaluation.py`, `reports/risk_summary.csv` |
-| 12 Reporting | `reports/executive_summary.md`, `reports/images/` |
-| 13 Productization | `app.py`, `docs/stakeholder_handoff.md` |
-| 14 Monitoring | `docs/monitoring_plan.md`, `docs/handoff_plan.md` |
-| 15 Orchestration | `docs/orchestration_plan.md`, `src/run_step.py` |
-| 16 Lifecycle review | `docs/lifecycle_framework_guide.md`, `docs/project_summary.md` |
+| 01–03: Scope and setup | `docs/stakeholder_memo.md`, `.env.example`, `requirements.txt` |
+| 04–05: Acquisition and storage | `src/data.py`, `src/storage.py`, `data/` |
+| 06–09: Cleaning, EDA, and features | `src/cleaning.py`, `src/eda.py`, `src/features.py` |
+| 10–11: Modeling and evaluation | `src/modeling.py`, `src/strategy.py`, `src/evaluation.py` |
+| 12–13: Reporting and API | `reports/`, `app.py` |
+| 14–15: Monitoring and orchestration | `docs/monitoring_plan.md`, `src/run_step.py` |
+| 16: Lifecycle review | `docs/lifecycle_framework_guide.md`, `docs/project_summary.md` |
 
-The detailed lifecycle decisions are in `docs/lifecycle_framework_guide.md`.
+## Limits and Next Steps
+
+The fixed universe creates selection and survivorship bias, and the cost model is simplified. Before any deployment, the strategy should be tested with walk-forward parameter selection, different cost assumptions, and paper trading. Detailed assumptions and decisions are documented in `docs/`.
