@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project tests a monthly ETF rotation strategy. It ranks eight ETFs by six-month momentum and holds the top two at equal weights in the following month. SPY is the benchmark.
+This project tests a monthly ETF rotation strategy for an investment analyst evaluating a transparent allocation baseline. It ranks eight ETFs by six-month momentum, holds the top two at equal weights in the following month, and compares the result with SPY.
 
 The data comes from Yahoo Finance through `yfinance` and covers January 2016 through August 2026. The analysis uses lagged signals to avoid look-ahead bias. Results are educational and exclude taxes, market impact, and changing bid-ask spreads.
 
@@ -19,7 +19,7 @@ Over the aligned sample, SPY returned 14.98% annually with a 0.99 Sharpe ratio a
 - `src/`: reusable data, modeling, strategy, and evaluation functions.
 - `model/`: saved regression model.
 - `reports/`: tables, charts, and the executive summary.
-- `docs/`: assumptions, monitoring, handoff, and lifecycle documents.
+- `docs/`: required handoff, monitoring, orchestration, and lifecycle documents.
 - `app.py`: Flask prediction API.
 
 ## Install and Run
@@ -76,7 +76,7 @@ This command reads the saved monthly backtest, writes `reports/orchestration_met
 
 | Stage | Main artifact |
 |---|---|
-| 01–03: Scope and setup | `docs/stakeholder_memo.md`, `.env.example`, `requirements.txt` |
+| 01–03: Scope and setup | `README.md`, `.env.example`, `requirements.txt` |
 | 04–05: Acquisition and storage | `src/data.py`, `src/storage.py`, `data/` |
 | 06–09: Cleaning, EDA, and features | `src/cleaning.py`, `src/eda.py`, `src/features.py` |
 | 10–11: Modeling and evaluation | `src/modeling.py`, `src/strategy.py`, `src/evaluation.py` |
@@ -86,4 +86,4 @@ This command reads the saved monthly backtest, writes `reports/orchestration_met
 
 ## Limits and Next Steps
 
-The fixed universe creates selection and survivorship bias, and the cost model is simplified. Before any deployment, the strategy should be tested with walk-forward parameter selection, different cost assumptions, and paper trading. Detailed assumptions and decisions are documented in `docs/`.
+The fixed universe creates selection and survivorship bias, and the cost model is simplified. IQR outliers are flagged but retained because they may be real market shocks. Before deployment, the strategy should be tested with walk-forward parameter selection, different cost assumptions, and paper trading.
