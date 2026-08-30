@@ -4,20 +4,27 @@ This folder provides a reproducible Python setup for the bootcamp assignments. I
 
 ## Folder Structure
 
-- `data/` - local assignment data.
-- `notebooks/` - environment and configuration checks.
+- `data/raw/` - original local inputs.
+- `data/processed/` - cleaned or transformed outputs.
+- `docs/` - supporting notes.
+- `model/` - saved model artifacts.
+- `notebooks/` - optional working notebooks.
+- `reports/images/` - generated report figures.
 - `src/` - reusable configuration code.
+- `homework02_tooling-setup_submission.ipynb` - graded setup check.
 - `.env.example` - safe configuration template.
 - `requirements.txt` - frozen package versions from `bootcamp_env`.
+
+Empty scaffold folders contain `.gitkeep` files so the complete required structure remains visible in Git.
 
 ## Run
 
 ```powershell
 conda activate bootcamp_env
-cd homework/homework2
+cd homework/homework02
 jupyter lab
 ```
 
-Open `notebooks/00_project_setup.ipynb` and run all cells. The notebook should print `API_KEY present: True`.
+Open `homework02_tooling-setup_submission.ipynb` and run all cells. The notebook checks the Python environment and configuration without displaying the secret value.
 
 The real `.env` file is local and excluded by the repository `.gitignore`.

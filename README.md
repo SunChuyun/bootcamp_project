@@ -8,7 +8,7 @@
 - **homework_materials/** → Instructor homework sheets, starters, and project instructions; kept local and never pushed.
 
 ## Homework Folder Rules
-- Each homework is in its own subfolder (`homework0` through `homework13`).
+- Each homework is in its own subfolder (`homework00` through `homework13`).
 - Include all required files for grading.
 
 ## Class Materials Rules
@@ -20,3 +20,7 @@
 - Keep one cumulative project rather than one project folder per stage.
 - Run `project/notebooks/project_pipeline.ipynb` from top to bottom after each project contribution.
 - See `project/README.md` for setup, lifecycle mapping, API use, and the command-line reporting step.
+
+## AI Assistance Disclosure
+
+AI assistance was used for code review, debugging, documentation editing, and rubric checks. All submitted files and repository behavior were reviewed and verified in the project environment.
